@@ -1,0 +1,29 @@
+plugins {
+    id 'application'
+    id "org.openjfx.javafxplugin" version "0.0.10"
+}
+
+group 'org.noman'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+javafx {
+    version = "16"
+    modules = ["javafx.controls"]
+}
+
+application {
+    mainClassName "org.noman.App"
+}
+
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
+}
+
+test {
+    useJUnitPlatform()
+}
