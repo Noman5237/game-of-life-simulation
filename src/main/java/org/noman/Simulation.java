@@ -102,14 +102,19 @@ public class Simulation {
 	
 	
 	public void setState(int x, int y, int state) {
-		if (x < 0 || x >= width) {
-			return;
-		}
-		if (y < 0 || y >= height) {
-			return;
-		}
+		if (isNotValidCoordinate(x, y)) return;
 		
 		board[y][x] = state;
 		
+	}
+	
+	private boolean isNotValidCoordinate(int x, int y) {
+		if (x < 0 || x >= width) {
+			return true;
+		}
+		if (y < 0 || y >= height) {
+			return true;
+		}
+		return false;
 	}
 }
