@@ -4,7 +4,6 @@ import javafx.event.ActionEvent;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.Button;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
@@ -15,7 +14,6 @@ import javafx.scene.transform.NonInvertibleTransformException;
 
 public class MainView extends VBox {
 	
-	private Button stepButton;
 	private Canvas canvas;
 	private Simulation simulation;
 	private Affine transform;
@@ -24,14 +22,13 @@ public class MainView extends VBox {
 	public MainView() {
 		this.setOnKeyPressed(this::handleKeyPressed);
 		
-		stepButton = new Button("step");
-		stepButton.setOnAction(this::simulateStep);
+		ToolBar toolBar = new ToolBar(this);
 		
 		canvas = new Canvas(400, 400);
 		canvas.setOnMousePressed(this::editCanvas);
 		canvas.setOnMouseDragged(this::editCanvas);
 		
-		getChildren().addAll(this.stepButton, this.canvas);
+		getChildren().addAll(toolBar, this.canvas);
 		
 		simulation = new Simulation(10, 10);
 		transform = new Affine();
@@ -73,7 +70,7 @@ public class MainView extends VBox {
 		ctx.setFill(Color.BLACK);
 		for (int y = 0; y < simulation.height; y++) {
 			for (int x = 0; x < simulation.width; x++) {
-				if (simulation.getState(x, y) == 1) {
+				if (simulation.getState(x, y) == Simulation.ALIVE) {
 					ctx.fillRect(x, y, 1, 1);
 				}
 			}
@@ -91,8 +88,12 @@ public class MainView extends VBox {
 		
 	}
 	
-	private void simulateStep(ActionEvent actionEvent) {
+	public void simulateStep(ActionEvent actionEvent) {
 		simulation.step();
 		draw();
+	}
+	
+	public void setDrawMode(int drawMode) {
+		this.drawMode = drawMode;
 	}
 }
