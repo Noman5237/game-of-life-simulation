@@ -1,11 +1,17 @@
 package org.noman;
 
+import javafx.event.ActionEvent;
+import javafx.geometry.Point2D;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.transform.Affine;
+import javafx.scene.transform.NonInvertibleTransformException;
 
 public class MainView extends VBox {
 	
@@ -13,14 +19,17 @@ public class MainView extends VBox {
 	private Canvas canvas;
 	private Simulation simulation;
 	private Affine transform;
+	private int drawMode = 1;
 	
 	public MainView() {
+		this.setOnKeyPressed(this::handleKeyPressed);
+		
 		stepButton = new Button("step");
-		stepButton.setOnAction(actionEvent -> {
-			simulation.step();
-			draw();
-		});
+		stepButton.setOnAction(this::simulateStep);
+		
 		canvas = new Canvas(400, 400);
+		canvas.setOnMousePressed(this::editCanvas);
+		canvas.setOnMouseDragged(this::editCanvas);
 		
 		getChildren().addAll(this.stepButton, this.canvas);
 		
@@ -28,15 +37,28 @@ public class MainView extends VBox {
 		transform = new Affine();
 		transform.appendScale(400 / 10f, 400 / 10f);
 		
-		simulation.setAlive(2, 2);
-		simulation.setAlive(3, 2);
-		simulation.setAlive(4, 2);
+	}
+	
+	private void handleKeyPressed(KeyEvent keyEvent) {
+		KeyCode keyCode = keyEvent.getCode();
+		if (keyCode == KeyCode.D) {
+			drawMode = 1;
+		} else if (keyCode == KeyCode.E) {
+			drawMode = 0;
+		} else if (keyCode == KeyCode.S) {
+			simulateStep(new ActionEvent(keyEvent, this));
+		}
+	}
+	
+	private void editCanvas(MouseEvent mouseEvent) {
+		try {
+			Point2D boardIndex = transform.inverseTransform(mouseEvent.getX(), mouseEvent.getY());
+			simulation.setState((int) boardIndex.getX(), (int) boardIndex.getY(), drawMode);
+		} catch (NonInvertibleTransformException e) {
+			System.out.println("Mouse out of canvas!");
+		}
 		
-		simulation.setAlive(5, 5);
-		simulation.setAlive(5, 6);
-		simulation.setAlive(6, 5);
-		simulation.setAlive(3, 3);
-		
+		draw();
 	}
 	
 	public void draw() {
@@ -69,4 +91,8 @@ public class MainView extends VBox {
 		
 	}
 	
+	private void simulateStep(ActionEvent actionEvent) {
+		simulation.step();
+		draw();
+	}
 }

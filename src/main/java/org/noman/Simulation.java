@@ -31,11 +31,11 @@ public class Simulation {
 	}
 	
 	public void setAlive(int x, int y) {
-		board[y][x] = 1;
+		setState(x, y, 1);
 	}
 	
 	public void setDead(int x, int y) {
-		board[y][x] = 0;
+		setState(x, y, 0);
 	}
 	
 	public int getState(int x, int y) {
@@ -101,4 +101,15 @@ public class Simulation {
 	}
 	
 	
+	public void setState(int x, int y, int state) {
+		if (x < 0 || x >= width) {
+			return;
+		}
+		if (y < 0 || y >= height) {
+			return;
+		}
+		
+		board[y][x] = state;
+		
+	}
 }
