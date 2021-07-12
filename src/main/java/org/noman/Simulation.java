@@ -112,9 +112,6 @@ public class Simulation {
 		if (x < 0 || x >= width) {
 			return true;
 		}
-		if (y < 0 || y >= height) {
-			return true;
-		}
-		return false;
+		return y < 0 || y >= height;
 	}
 }
