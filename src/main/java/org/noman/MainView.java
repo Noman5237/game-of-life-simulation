@@ -18,22 +18,30 @@ public class MainView extends VBox {
 	private Simulation simulation;
 	private Affine transform;
 	private int drawMode = 1;
+	private InfoBar infoBar;
 	
 	public MainView() {
 		this.setOnKeyPressed(this::handleKeyPressed);
 		
 		ToolBar toolBar = new ToolBar(this);
+		infoBar = new InfoBar();
 		
 		canvas = new Canvas(400, 400);
 		canvas.setOnMousePressed(this::editCanvas);
 		canvas.setOnMouseDragged(this::editCanvas);
+		canvas.setOnMouseMoved(this::handleMouseMoved);
 		
-		getChildren().addAll(toolBar, this.canvas);
+		getChildren().addAll(toolBar, this.canvas, Spacer.Vertical(), infoBar);
 		
 		simulation = new Simulation(10, 10);
 		transform = new Affine();
 		transform.appendScale(400 / 10f, 400 / 10f);
 		
+	}
+	
+	private void handleMouseMoved(MouseEvent mouseEvent) {
+		Point2D boardIndex = getSimulationCoordinates(mouseEvent);
+		infoBar.setCursorPosition(((int) boardIndex.getX()), ((int) boardIndex.getY()));
 	}
 	
 	private void handleKeyPressed(KeyEvent keyEvent) {
@@ -48,14 +56,18 @@ public class MainView extends VBox {
 	}
 	
 	private void editCanvas(MouseEvent mouseEvent) {
-		try {
-			Point2D boardIndex = transform.inverseTransform(mouseEvent.getX(), mouseEvent.getY());
-			simulation.setState((int) boardIndex.getX(), (int) boardIndex.getY(), drawMode);
-		} catch (NonInvertibleTransformException e) {
-			System.out.println("Mouse out of canvas!");
-		}
-		
+		Point2D boardIndex = getSimulationCoordinates(mouseEvent);
+		simulation.setState((int) boardIndex.getX(), (int) boardIndex.getY(), drawMode);
+		handleMouseMoved(mouseEvent);
 		draw();
+	}
+	
+	private Point2D getSimulationCoordinates(MouseEvent mouseEvent) {
+		try {
+			return transform.inverseTransform(mouseEvent.getX(), mouseEvent.getY());
+		} catch (NonInvertibleTransformException e) {
+			throw new RuntimeException("Simulation coordinated invertible");
+		}
 	}
 	
 	public void draw() {
@@ -95,5 +107,6 @@ public class MainView extends VBox {
 	
 	public void setDrawMode(int drawMode) {
 		this.drawMode = drawMode;
+		infoBar.setDrawMode(drawMode);
 	}
 }
