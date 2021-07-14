@@ -12,12 +12,18 @@ public class ToolBar extends javafx.scene.control.ToolBar {
 		Button draw = new Button("Draw");
 		Button erase = new Button("Erase");
 		Button step = new Button("Step");
+		Button reset = new Button("Reset");
 		
-		this.getItems().addAll(draw, erase, step);
+		this.getItems().addAll(draw, erase, reset, step);
 		
 		draw.setOnAction(this::handleDraw);
 		erase.setOnAction(this::handleErase);
 		step.setOnAction(this::handleStep);
+		reset.setOnAction(this::handleReset);
+	}
+	
+	private void handleReset(ActionEvent actionEvent) {
+		mainView.resetSimulation(actionEvent);
 	}
 	
 	private void handleStep(ActionEvent actionEvent) {

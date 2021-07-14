@@ -17,8 +17,14 @@ public class MainView extends VBox {
 	private Canvas canvas;
 	private Simulation simulation;
 	private Affine transform;
-	private int drawMode = 1;
+	private int drawMode = Simulation.ALIVE;
 	private InfoBar infoBar;
+	
+	public static final int EDITING = 0;
+	public static final int SIMULATING = 1;
+	
+	private Simulation editingSimulation;
+	private int applicationState = EDITING;
 	
 	public MainView() {
 		this.setOnKeyPressed(this::handleKeyPressed);
@@ -33,7 +39,8 @@ public class MainView extends VBox {
 		
 		getChildren().addAll(toolBar, this.canvas, Spacer.Vertical(), infoBar);
 		
-		simulation = new Simulation(10, 10);
+		editingSimulation = new Simulation(10, 10);
+		simulation = Simulation.copy(editingSimulation);
 		transform = new Affine();
 		transform.appendScale(400 / 10f, 400 / 10f);
 		
@@ -47,18 +54,23 @@ public class MainView extends VBox {
 	private void handleKeyPressed(KeyEvent keyEvent) {
 		KeyCode keyCode = keyEvent.getCode();
 		if (keyCode == KeyCode.D) {
-			drawMode = 1;
+			setDrawMode(Simulation.ALIVE);
 		} else if (keyCode == KeyCode.E) {
-			drawMode = 0;
+			setDrawMode(Simulation.DEAD);
 		} else if (keyCode == KeyCode.S) {
 			simulateStep(new ActionEvent(keyEvent, this));
+		} else if (keyCode == KeyCode.R) {
+			resetSimulation(new ActionEvent(keyEvent, this));
 		}
 	}
 	
 	private void editCanvas(MouseEvent mouseEvent) {
-		Point2D boardIndex = getSimulationCoordinates(mouseEvent);
-		simulation.setState((int) boardIndex.getX(), (int) boardIndex.getY(), drawMode);
 		handleMouseMoved(mouseEvent);
+		if (applicationState == SIMULATING) {
+			return;
+		}
+		Point2D boardIndex = getSimulationCoordinates(mouseEvent);
+		editingSimulation.setState((int) boardIndex.getX(), (int) boardIndex.getY(), drawMode);
 		draw();
 	}
 	
@@ -71,6 +83,14 @@ public class MainView extends VBox {
 	}
 	
 	public void draw() {
+		if (applicationState == EDITING) {
+			drawSimulation(editingSimulation);
+		} else {
+			drawSimulation(simulation);
+		}
+	}
+	
+	private void drawSimulation(Simulation simulationToDraw) {
 		GraphicsContext ctx = canvas.getGraphicsContext2D();
 		ctx.setTransform(transform);
 		
@@ -80,9 +100,9 @@ public class MainView extends VBox {
 		
 		// alive cells
 		ctx.setFill(Color.BLACK);
-		for (int y = 0; y < simulation.height; y++) {
-			for (int x = 0; x < simulation.width; x++) {
-				if (simulation.getState(x, y) == Simulation.ALIVE) {
+		for (int y = 0; y < simulationToDraw.height; y++) {
+			for (int x = 0; x < simulationToDraw.width; x++) {
+				if (simulationToDraw.getState(x, y) == Simulation.ALIVE) {
 					ctx.fillRect(x, y, 1, 1);
 				}
 			}
@@ -91,16 +111,23 @@ public class MainView extends VBox {
 		// grid lines
 		ctx.setStroke(Color.GRAY);
 		ctx.setLineWidth(0.05);
-		for (int y = 0; y <= simulation.height; y++) {
-			ctx.strokeLine(0, y, simulation.width, y);
+		for (int y = 0; y <= simulationToDraw.height; y++) {
+			ctx.strokeLine(0, y, simulationToDraw.width, y);
 		}
-		for (int x = 0; x <= simulation.width; x++) {
-			ctx.strokeLine(x, 0, x, simulation.height);
+		for (int x = 0; x <= simulationToDraw.width; x++) {
+			ctx.strokeLine(x, 0, x, simulationToDraw.height);
 		}
-		
+	}
+	
+	public void setApplicationState(int applicationState) {
+		if (this.applicationState == EDITING && applicationState == SIMULATING) {
+			simulation = Simulation.copy(editingSimulation);
+		}
+		this.applicationState = applicationState;
 	}
 	
 	public void simulateStep(ActionEvent actionEvent) {
+		setApplicationState(SIMULATING);
 		simulation.step();
 		draw();
 	}
@@ -108,5 +135,10 @@ public class MainView extends VBox {
 	public void setDrawMode(int drawMode) {
 		this.drawMode = drawMode;
 		infoBar.setDrawMode(drawMode);
+	}
+	
+	public void resetSimulation(ActionEvent actionEvent) {
+		setApplicationState(MainView.EDITING);
+		draw();
 	}
 }

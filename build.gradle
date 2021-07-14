@@ -1,10 +1,10 @@
 plugins {
-    id 'application'
+    id "application"
     id "org.openjfx.javafxplugin" version "0.0.10"
 }
 
-group 'org.noman'
-version '1.0-SNAPSHOT'
+group "org.noman"
+version "1.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
@@ -20,8 +20,8 @@ application {
 }
 
 dependencies {
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
+    testImplementation "org.junit.jupiter:junit-jupiter-api:5.7.0"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.7.0"
 }
 
 test {
