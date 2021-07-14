@@ -13,6 +13,7 @@ public class App extends Application {
 		Scene scene = new Scene(mainView, 640, 480);
 		primaryStage.setScene(scene);
 		primaryStage.show();
+		primaryStage.setTitle("Game of Life Simulation");
 		mainView.draw();
 	}
 }

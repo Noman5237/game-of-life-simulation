@@ -26,6 +26,8 @@ public class MainView extends VBox {
 	private Simulation editingSimulation;
 	private int applicationState = EDITING;
 	
+	private Simulator simulator;
+	
 	public MainView() {
 		this.setOnKeyPressed(this::handleKeyPressed);
 		
@@ -44,6 +46,7 @@ public class MainView extends VBox {
 		transform = new Affine();
 		transform.appendScale(400 / 10f, 400 / 10f);
 		
+		simulator = new Simulator(this);
 	}
 	
 	private void handleMouseMoved(MouseEvent mouseEvent) {
@@ -140,5 +143,15 @@ public class MainView extends VBox {
 	public void resetSimulation(ActionEvent actionEvent) {
 		setApplicationState(MainView.EDITING);
 		draw();
+	}
+	
+	
+	public void startContinuousSimulation() {
+		setApplicationState(SIMULATING);
+		simulator.start();
+	}
+	
+	public void stopContinuousSimulation() {
+		simulator.stop();
 	}
 }
