@@ -142,6 +142,7 @@ public class MainView extends VBox {
 	
 	public void resetSimulation(ActionEvent actionEvent) {
 		setApplicationState(MainView.EDITING);
+		stopContinuousSimulation();
 		draw();
 	}
 	
