@@ -15,15 +15,17 @@ public class StandardRule implements Rule {
 		int count = 0;
 		for (int yNeighbour = y - 1; yNeighbour <= y + 1; yNeighbour++) {
 			for (int xNeighbour = x - 1; xNeighbour <= x + 1; xNeighbour++) {
-				count += this.board.getCellState(xNeighbour, yNeighbour) == CellState.ALIVE ? 1 : 0;
+				count += getCellCount(xNeighbour, yNeighbour);
 			}
 		}
 		// because we have counted the cell [x][y] too if its alive
-		if (this.board.getCellState(x, y) == CellState.ALIVE) {
-			count -= 1;
-		}
+		count -= getCellCount(x, y);
 		
 		return count;
+	}
+	
+	private int getCellCount(int x, int y) {
+		return this.board.getCellState(x, y) == CellState.ALIVE ? 1 : 0;
 	}
 	
 	@Override
