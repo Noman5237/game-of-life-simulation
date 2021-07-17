@@ -1,4 +1,4 @@
-package org.noman;
+package org.noman.gol;
 
 import javafx.event.ActionEvent;
 import javafx.scene.control.Button;

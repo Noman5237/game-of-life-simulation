@@ -1,4 +1,4 @@
-package org.noman;
+package org.noman.gol;
 
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;

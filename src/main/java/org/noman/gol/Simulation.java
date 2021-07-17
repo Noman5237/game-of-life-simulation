@@ -1,4 +1,4 @@
-package org.noman;
+package org.noman.gol;
 
 public class Simulation {
 	

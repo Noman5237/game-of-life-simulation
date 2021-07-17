@@ -1,4 +1,4 @@
-package org.noman;
+package org.noman.gol;
 
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;

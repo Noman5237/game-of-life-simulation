@@ -1,4 +1,4 @@
-package org.noman;
+package org.noman.gol;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;

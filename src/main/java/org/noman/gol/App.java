@@ -1,4 +1,4 @@
-package org.noman;
+package org.noman.gol;
 
 import javafx.application.Application;
 import javafx.scene.Scene;

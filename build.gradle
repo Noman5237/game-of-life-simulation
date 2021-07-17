@@ -16,7 +16,7 @@ javafx {
 }
 
 application {
-    mainClassName "org.noman.App"
+    mainClassName "org.noman.gol.App"
 }
 
 dependencies {
