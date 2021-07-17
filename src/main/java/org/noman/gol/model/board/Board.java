@@ -1,4 +1,4 @@
-package org.noman.gol.board;
+package org.noman.gol.model.board;
 
 import org.noman.gol.CellState;
 

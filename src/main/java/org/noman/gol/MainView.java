@@ -1,6 +1,5 @@
 package org.noman.gol;
 
-import javafx.event.ActionEvent;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -11,43 +10,95 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.transform.Affine;
 import javafx.scene.transform.NonInvertibleTransformException;
+import org.noman.gol.model.board.Board;
+import org.noman.gol.model.board.StandardBoundedBoard;
+import org.noman.gol.model.rule.StandardRule;
 
 public class MainView extends VBox {
 	
-	private Canvas canvas;
+	private final Board board;
 	private Simulation simulation;
-	private Affine transform;
-	private int drawMode = Simulation.ALIVE;
-	private InfoBar infoBar;
 	
+	private final ToolBar toolBar;
+	private final InfoBar infoBar;
+	private final Canvas canvas;
+	private final Affine transform;
+	
+	private CellState drawMode = CellState.ALIVE;
 	public static final int EDITING = 0;
 	public static final int SIMULATING = 1;
-	
-	private Simulation editingSimulation;
 	private int applicationState = EDITING;
 	
-	private Simulator simulator;
-	
 	public MainView() {
-		this.setOnKeyPressed(this::handleKeyPressed);
-		
-		ToolBar toolBar = new ToolBar(this);
-		infoBar = new InfoBar();
-		
-		canvas = new Canvas(400, 400);
-		canvas.setOnMousePressed(this::editCanvas);
-		canvas.setOnMouseDragged(this::editCanvas);
-		canvas.setOnMouseMoved(this::handleMouseMoved);
-		
+		this.board = new StandardBoundedBoard(10, 10);
+		this.simulation = new Simulation(board, new StandardRule());
+		this.toolBar = new ToolBar(this);
+		this.infoBar = new InfoBar();
+		this.canvas = new Canvas(400, 400);
 		getChildren().addAll(toolBar, this.canvas, Spacer.Vertical(), infoBar);
 		
-		editingSimulation = new Simulation(10, 10);
-		simulation = Simulation.copy(editingSimulation);
-		transform = new Affine();
-		transform.appendScale(400 / 10f, 400 / 10f);
+		this.transform = new Affine();
+		this.transform.appendScale(400 / 10f, 400 / 10f);
 		
-		simulator = new Simulator(this);
+		this.setOnKeyPressed(this::handleKeyPressed);
+		this.canvas.setOnMousePressed(this::editBoard);
+		this.canvas.setOnMouseDragged(this::editBoard);
+		this.canvas.setOnMouseMoved(this::handleMouseMoved);
 	}
+	
+	public void draw() {
+		if (applicationState == EDITING) {
+			drawBoard(board);
+		} else {
+			drawBoard(simulation.getBoard());
+		}
+	}
+	
+	private void drawBoard(Board boardToDraw) {
+		GraphicsContext ctx = canvas.getGraphicsContext2D();
+		ctx.setTransform(transform);
+		
+		// background
+		ctx.setFill(Color.LIGHTGRAY);
+		ctx.fillRect(0, 0, 400, 400);
+		
+		// alive cells
+		ctx.setFill(Color.BLACK);
+		for (int y = 0; y < boardToDraw.getHeight(); y++) {
+			for (int x = 0; x < boardToDraw.getWidth(); x++) {
+				if (boardToDraw.getCellState(x, y) == CellState.ALIVE) {
+					ctx.fillRect(x, y, 1, 1);
+				}
+			}
+		}
+		
+		// grid lines
+		ctx.setStroke(Color.GRAY);
+		ctx.setLineWidth(0.05);
+		for (int y = 0; y <= boardToDraw.getHeight(); y++) {
+			ctx.strokeLine(0, y, boardToDraw.getWidth(), y);
+		}
+		for (int x = 0; x <= boardToDraw.getWidth(); x++) {
+			ctx.strokeLine(x, 0, x, boardToDraw.getHeight());
+		}
+	}
+	
+	private void editBoard(MouseEvent mouseEvent) {
+		handleMouseMoved(mouseEvent);
+		if (applicationState == SIMULATING) {
+			return;
+		}
+		Point2D boardIndex = getSimulationCoordinates(mouseEvent);
+		this.board.setCellState((int) boardIndex.getX(), (int) boardIndex.getY(), drawMode);
+		draw();
+	}
+	
+	public void simulateStep() {
+		setApplicationState(SIMULATING);
+		simulation.step();
+		draw();
+	}
+	
 	
 	private void handleMouseMoved(MouseEvent mouseEvent) {
 		Point2D boardIndex = getSimulationCoordinates(mouseEvent);
@@ -57,24 +108,14 @@ public class MainView extends VBox {
 	private void handleKeyPressed(KeyEvent keyEvent) {
 		KeyCode keyCode = keyEvent.getCode();
 		if (keyCode == KeyCode.D) {
-			setDrawMode(Simulation.ALIVE);
+			setDrawMode(CellState.ALIVE);
 		} else if (keyCode == KeyCode.E) {
-			setDrawMode(Simulation.DEAD);
+			setDrawMode(CellState.DEAD);
 		} else if (keyCode == KeyCode.S) {
-			simulateStep(new ActionEvent(keyEvent, this));
+			simulateStep();
 		} else if (keyCode == KeyCode.R) {
-			resetSimulation(new ActionEvent(keyEvent, this));
+			toolBar.resetSimulation();
 		}
-	}
-	
-	private void editCanvas(MouseEvent mouseEvent) {
-		handleMouseMoved(mouseEvent);
-		if (applicationState == SIMULATING) {
-			return;
-		}
-		Point2D boardIndex = getSimulationCoordinates(mouseEvent);
-		editingSimulation.setState((int) boardIndex.getX(), (int) boardIndex.getY(), drawMode);
-		draw();
 	}
 	
 	private Point2D getSimulationCoordinates(MouseEvent mouseEvent) {
@@ -85,74 +126,16 @@ public class MainView extends VBox {
 		}
 	}
 	
-	public void draw() {
-		if (applicationState == EDITING) {
-			drawSimulation(editingSimulation);
-		} else {
-			drawSimulation(simulation);
-		}
-	}
-	
-	private void drawSimulation(Simulation simulationToDraw) {
-		GraphicsContext ctx = canvas.getGraphicsContext2D();
-		ctx.setTransform(transform);
-		
-		// background
-		ctx.setFill(Color.LIGHTGRAY);
-		ctx.fillRect(0, 0, 400, 400);
-		
-		// alive cells
-		ctx.setFill(Color.BLACK);
-		for (int y = 0; y < simulationToDraw.height; y++) {
-			for (int x = 0; x < simulationToDraw.width; x++) {
-				if (simulationToDraw.getState(x, y) == Simulation.ALIVE) {
-					ctx.fillRect(x, y, 1, 1);
-				}
-			}
-		}
-		
-		// grid lines
-		ctx.setStroke(Color.GRAY);
-		ctx.setLineWidth(0.05);
-		for (int y = 0; y <= simulationToDraw.height; y++) {
-			ctx.strokeLine(0, y, simulationToDraw.width, y);
-		}
-		for (int x = 0; x <= simulationToDraw.width; x++) {
-			ctx.strokeLine(x, 0, x, simulationToDraw.height);
-		}
-	}
-	
 	public void setApplicationState(int applicationState) {
 		if (this.applicationState == EDITING && applicationState == SIMULATING) {
-			simulation = Simulation.copy(editingSimulation);
+			this.simulation = new Simulation(this.board.copy(), new StandardRule());
 		}
 		this.applicationState = applicationState;
 	}
 	
-	public void simulateStep(ActionEvent actionEvent) {
-		setApplicationState(SIMULATING);
-		simulation.step();
-		draw();
-	}
-	
-	public void setDrawMode(int drawMode) {
+	public void setDrawMode(CellState drawMode) {
 		this.drawMode = drawMode;
 		infoBar.setDrawMode(drawMode);
 	}
 	
-	public void resetSimulation(ActionEvent actionEvent) {
-		setApplicationState(MainView.EDITING);
-		stopContinuousSimulation();
-		draw();
-	}
-	
-	
-	public void startContinuousSimulation() {
-		setApplicationState(SIMULATING);
-		simulator.start();
-	}
-	
-	public void stopContinuousSimulation() {
-		simulator.stop();
-	}
 }

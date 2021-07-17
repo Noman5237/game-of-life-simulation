@@ -7,8 +7,8 @@ import javafx.util.Duration;
 
 public class Simulator {
 	
-	private Timeline timeline;
-	private MainView mainView;
+	private final Timeline timeline;
+	private final MainView mainView;
 	
 	public Simulator(MainView mainView) {
 		this.mainView = mainView;
@@ -17,7 +17,7 @@ public class Simulator {
 	}
 	
 	private void doStep(ActionEvent actionEvent) {
-		mainView.simulateStep(actionEvent);
+		mainView.simulateStep();
 	}
 	
 	public void start() {

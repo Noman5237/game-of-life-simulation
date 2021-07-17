@@ -1,12 +1,12 @@
-package org.noman.gol.board;
+package org.noman.gol.model.board;
 
 import org.noman.gol.CellState;
 
 public class StandardBoundedBoard implements Board {
 	
-	private int width;
-	private int height;
-	private CellState[][] board;
+	private final int width;
+	private final int height;
+	private final CellState[][] board;
 	
 	public StandardBoundedBoard(int width, int height) {
 		this.width = width;

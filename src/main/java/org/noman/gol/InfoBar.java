@@ -7,8 +7,8 @@ public class InfoBar extends HBox {
 	
 	final static String DRAW_MODE_FORMAT = "Draw Mode: %s";
 	final static String CURSOR_POSITION_FORMAT = "Cursor Position: (%d, %d)";
-	private Label drawModeIndicator;
-	private Label cursorPosition;
+	private final Label drawModeIndicator;
+	private final Label cursorPosition;
 	
 	public InfoBar() {
 		drawModeIndicator = new Label("Draw Mode: Drawing");
@@ -17,9 +17,9 @@ public class InfoBar extends HBox {
 		this.getChildren().addAll(drawModeIndicator, Spacer.Horizontal(), cursorPosition);
 	}
 	
-	void setDrawMode(int mode) {
+	void setDrawMode(CellState mode) {
 		String drawMode = "Erasing";
-		if (mode == Simulation.ALIVE) {
+		if (mode == CellState.ALIVE) {
 			drawMode = "Drawing";
 		}
 		
