@@ -14,7 +14,7 @@ public class StandardBoundedBoard implements Board {
 		this.board = new CellState[height][width];
 		
 		for (int y = 0; y < this.height; y++) {
-			for (int x = 0; x < this.height; x++) {
+			for (int x = 0; x < this.width; x++) {
 				this.setCellState(x, y, CellState.DEAD);
 			}
 		}
@@ -46,7 +46,7 @@ public class StandardBoundedBoard implements Board {
 	public StandardBoundedBoard copy() {
 		StandardBoundedBoard copy = new StandardBoundedBoard(this.width, this.height);
 		for (int y = 0; y < copy.height; y++) {
-			for (int x = 0; x < copy.height; x++) {
+			for (int x = 0; x < copy.width; x++) {
 				copy.setCellState(x, y, this.getCellState(x, y));
 			}
 		}
