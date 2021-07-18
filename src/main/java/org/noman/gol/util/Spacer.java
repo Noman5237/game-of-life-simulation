@@ -1,4 +1,4 @@
-package org.noman.gol;
+package org.noman.gol.util;
 
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -7,13 +7,13 @@ import javafx.scene.layout.VBox;
 
 public class Spacer {
 	
-	static Pane Horizontal() {
+	public static Pane Horizontal() {
 		Pane spacer = getPane();
 		HBox.setHgrow(spacer, Priority.ALWAYS);
 		return spacer;
 	}
 	
-	static Pane Vertical() {
+	public static Pane Vertical() {
 		Pane spacer = getPane();
 		VBox.setVgrow(spacer, Priority.ALWAYS);
 		return spacer;

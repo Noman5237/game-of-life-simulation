@@ -2,6 +2,7 @@ package org.noman.gol;
 
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
+import org.noman.gol.util.Spacer;
 
 public class InfoBar extends HBox {
 	

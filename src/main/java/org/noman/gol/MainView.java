@@ -13,6 +13,7 @@ import javafx.scene.transform.NonInvertibleTransformException;
 import org.noman.gol.model.board.Board;
 import org.noman.gol.model.board.StandardBoundedBoard;
 import org.noman.gol.model.rule.StandardRule;
+import org.noman.gol.util.Spacer;
 
 public class MainView extends VBox {
 	

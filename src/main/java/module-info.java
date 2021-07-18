@@ -3,4 +3,5 @@ module org.noman.gol {
 	exports org.noman.gol;
 	exports org.noman.gol.model.board;
 	exports org.noman.gol.model.rule;
+	exports org.noman.gol.util;
 }
