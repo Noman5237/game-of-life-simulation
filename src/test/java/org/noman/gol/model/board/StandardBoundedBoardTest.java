@@ -11,17 +11,17 @@ import org.noman.gol.CellState;
 import org.noman.gol.util.CellPositionNState;
 
 import java.util.ArrayList;
-import java.util.Random;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class StandardBoundedBoardTest {
 	
+	public static final int BOARD_WIDTH = 5;
+	public static final int BOARD_HEIGHT = 3;
+	public static final int MAX_DYNAMIC_ARGS = 10;
+	
 	private Board board;
-	private static final int BOARD_WIDTH = 5;
-	private static final int BOARD_HEIGHT = 3;
-	private static final int MAX_DYNAMIC_ARGS = 10;
 	
 	@BeforeEach
 	void setUp() {
@@ -45,7 +45,7 @@ class StandardBoundedBoardTest {
 	}
 	
 	@ParameterizedTest (name = "getter and setter testing with random values")
-	@MethodSource ("getRandomPositionNState")
+	@MethodSource ("getRandomPositionNStateWrapper")
 	@ExtendWith (CellPositionNState.class)
 	void testSetNGetCellStateOfValidCells(ArrayList<CellPositionNState> cellPositionNStates) {
 		for (CellPositionNState cellPositionNState : cellPositionNStates) {
@@ -71,7 +71,7 @@ class StandardBoundedBoardTest {
 	
 	
 	@ParameterizedTest (name = "copying board states correctly")
-	@MethodSource ("getRandomPositionNState")
+	@MethodSource ("getRandomPositionNStateWrapper")
 	@ExtendWith (CellPositionNState.class)
 	void testCopyCorrectStates(ArrayList<CellPositionNState> cellPositionNStates) {
 		for (CellPositionNState cellPositionNState : cellPositionNStates) {
@@ -87,7 +87,7 @@ class StandardBoundedBoardTest {
 	}
 	
 	@ParameterizedTest (name = "deep copying board")
-	@MethodSource ("getRandomPositionNState")
+	@MethodSource ("getRandomPositionNStateWrapper")
 	@ExtendWith (CellPositionNState.class)
 	void testDeepCopy(ArrayList<CellPositionNState> cellPositionNStates) {
 		Board copyBoard = board.copy();
@@ -100,25 +100,8 @@ class StandardBoundedBoardTest {
 		
 	}
 	
-	static Stream<ArrayList<CellPositionNState>> getRandomPositionNState() {
-		ArrayList<CellPositionNState> cellPositionNStates = new ArrayList<>();
-		while (cellPositionNStates.size() != MAX_DYNAMIC_ARGS) {
-			boolean unique = true;
-			Random random = new Random();
-			int x = random.nextInt(BOARD_WIDTH);
-			int y = random.nextInt(BOARD_HEIGHT);
-			for (CellPositionNState cellPositionNState : cellPositionNStates) {
-				if (cellPositionNState.getX() == x && cellPositionNState.getY() == y) {
-					unique = false;
-					break;
-				}
-			}
-			if (unique) {
-				CellState cellState = CellState.values()[random.nextInt(CellState.values().length)];
-				cellPositionNStates.add(new CellPositionNState(x, y, cellState));
-			}
-		}
-		
-		return Stream.of(cellPositionNStates);
+	private static Stream<ArrayList<CellPositionNState>> getRandomPositionNStateWrapper() {
+		return CellPositionNState.getRandomPositionNState(BOARD_WIDTH, BOARD_HEIGHT, MAX_DYNAMIC_ARGS);
 	}
+	
 }
