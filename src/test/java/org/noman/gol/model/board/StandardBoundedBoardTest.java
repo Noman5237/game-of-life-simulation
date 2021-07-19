@@ -17,9 +17,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class StandardBoundedBoardTest {
 	
-	public static final int BOARD_WIDTH = 5;
-	public static final int BOARD_HEIGHT = 3;
-	public static final int MAX_DYNAMIC_ARGS = 10;
+	private static final int BOARD_WIDTH = 5;
+	private static final int BOARD_HEIGHT = 3;
+	private static final int MAX_DYNAMIC_ARGS = 10;
 	
 	private Board board;
 	
@@ -68,7 +68,6 @@ class StandardBoundedBoardTest {
 		board.setCellState(x, y, cellState);
 		assertEquals(CellState.DEAD, board.getCellState(x, y));
 	}
-	
 	
 	@ParameterizedTest (name = "copying board states correctly")
 	@MethodSource ("getRandomPositionNStateWrapper")

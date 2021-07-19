@@ -5,7 +5,7 @@ import org.noman.gol.model.board.Board;
 
 public class StandardRule implements Rule {
 	
-	public int countAliveNeighbours(int x, int y, Board board) {
+	private int countAliveNeighbours(int x, int y, Board board) {
 		int count = 0;
 		for (int yNeighbour = y - 1; yNeighbour <= y + 1; yNeighbour++) {
 			for (int xNeighbour = x - 1; xNeighbour <= x + 1; xNeighbour++) {
